@@ -16,18 +16,18 @@ NUMBER_OF_MESSAGES_TO_DISPLAY = 20
 API_DOCS_URL = "https://docs.streamlit.io/library/api-reference"
 
 # Retrieve and validate API key
-OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY", None)
-if not OPENAI_API_KEY:
-    st.error("Please add your OpenAI API key to the Streamlit secrets.toml file.")
-    st.stop()
+# OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY", None)
+# if not OPENAI_API_KEY:
+#     st.error("Please add your OpenAI API key to the Streamlit secrets.toml file.")
+#     st.stop()
 
 # Assign OpenAI API Key
-openai.api_key = OPENAI_API_KEY
-client = openai.OpenAI()
+# openai.api_key = OPENAI_API_KEY
+# client = openai.OpenAI()
 
 # Streamlit Page Configuration
 st.set_page_config(
-    page_title="Streamly - An Intelligent Streamlit Assistant",
+    page_title="AI-Bot",
     page_icon="imgs/avatar_streamly.png",
     layout="wide",
     initial_sidebar_state="auto",
@@ -49,7 +49,8 @@ st.set_page_config(
 )
 
 # Streamlit Title
-st.title("Streamly Streamlit Assistant")
+st.title("공공 데이터 AI 검색 로봇 입니다.")
+#st.title("AI-Based Korea Public Data API Recommendation Bot")
 
 def img_to_base64(image_path):
     """Convert image to base64."""
@@ -96,7 +97,7 @@ def load_and_enhance_image(image_path, enhance=False):
 def load_streamlit_updates():
     """Load the latest Streamlit updates from a local JSON file."""
     try:
-        with open("data/streamlit_updates.json", "r") as f:
+        with open("data/streamlit_updates.json", "r", encoding="utf-8") as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         logging.error(f"Error loading JSON: {str(e)}")
@@ -129,7 +130,7 @@ def initialize_conversation():
     Returns:
     - list: Initialized conversation history.
     """
-    assistant_message = "Hello! I am Streamly. How can I assist you with Streamlit today?"
+    assistant_message = "xxxx"
 
     conversation_history = [
         {"role": "system", "content": "You are Streamly, a specialized AI assistant trained in Streamlit."},
@@ -208,23 +209,23 @@ def on_chat_submit(chat_input, latest_updates):
 
     try:
         model_engine = "gpt-4o-mini"
-        assistant_reply = ""
-
-        if "latest updates" in user_input:
-            assistant_reply = "Here are the latest highlights from Streamlit:\n"
-            highlights = latest_updates.get("Highlights", {})
-            if highlights:
-                for version, info in highlights.items():
-                    description = info.get("Description", "No description available.")
-                    assistant_reply += f"- **{version}**: {description}\n"
-            else:
-                assistant_reply = "No highlights found."
-        else:
-            response = client.chat.completions.create(
-                model=model_engine,
-                messages=st.session_state.conversation_history
-            )
-            assistant_reply = response.choices[0].message.content
+        assistant_reply = "가짜 응답"
+        # 
+        # if "latest updates" in user_input:
+        #     assistant_reply = "Here are the latest highlights from Streamlit:\n"
+        #     highlights = latest_updates.get("Highlights", {})
+        #     if highlights:
+        #         for version, info in highlights.items():
+        #             description = info.get("Description", "No description available.")
+        #             assistant_reply += f"- **{version}**: {description}\n"
+        #     else:
+        #         assistant_reply = "No highlights found."
+        # else:
+        #     response = client.chat.completions.create(
+        #         model=model_engine,
+        #         messages=st.session_state.conversation_history
+        #     )
+        #     assistant_reply = response.choices[0].message.content
 
         st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
         st.session_state.history.append({"role": "user", "content": user_input})
@@ -248,7 +249,7 @@ def main():
     initialize_session_state()
 
     if not st.session_state.history:
-        initial_bot_message = "Hello! How can I assist you with Streamlit today?"
+        initial_bot_message = "안녕하세요! 어떤 데이터를 찾고 계신가요? 제가 관련 API를 찾아 볼께요!"
         st.session_state.history.append({"role": "assistant", "content": initial_bot_message})
         st.session_state.conversation_history = initialize_conversation()
 
