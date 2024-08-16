@@ -32,18 +32,20 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="auto",
     menu_items={
-        "Get help": "https://github.com/AdieLaine/Streamly",
-        "Report a bug": "https://github.com/AdieLaine/Streamly",
+        "Get help": "https://github.com/sungil",
+        "Report a bug": "https://github.com/sungil",
         "About": """
-            ## Streamly Streamlit Assistant
-            ### Powered using GPT-4o-mini
-
-            **GitHub**: https://github.com/AdieLaine/
-
-            The AI Assistant named, Streamly, aims to provide the latest updates from Streamlit,
-            generate code snippets for Streamlit widgets,
-            and answer questions about Streamlit's latest features, issues, and more.
-            Streamly has been trained on the latest Streamlit updates and documentation.
+            ### AI-Based API Recommendation Bot
+            Powered using Naver Clovax-HCX-003.
+            
+            GitHub: https://github.com/sungil
+            
+            The UI source refers to streamly(https://github.com/AdieLaine/Streamly).
+            
+            공공 데이터 AI 검색 로봇은 data.go.kr 에서 제공 하는 약 1만 2천건의 방대한 공공 데이터 API를 좀더 쉽고 편리하게
+            사용자가 검색할 수 있도록 자연어 검색이 가능한 AI 기술을 적용한 서비스 입니다. AI LLM 모델은 
+            Naver Clovax-HCX-003가 적용 되어 있으며 웹 UI는 아래의 Streamlit 코드와 라이선스가 적용되어 있습니다. 
+            
         """
     }
 )
@@ -120,8 +122,8 @@ def get_streamlit_api_code_version():
 
 def display_streamlit_updates():
     """Display the latest updates of the Streamlit."""
-    with st.expander("Streamlit 1.36 Announcement", expanded=False):
-        st.markdown("For more details on this version, check out the [Streamlit Forum post](https://docs.streamlit.io/library/changelog#version).")
+    with st.expander("API AI Bot Announcement", expanded=False):
+        st.markdown("2024.09 베타 서비스 시작")
 
 def initialize_conversation():
     """
@@ -279,7 +281,7 @@ def main():
     )
 
     # Load and display sidebar image
-    img_path = "imgs/sidebar_streamly_avatar.png"
+    img_path = "imgs/avatar_streamly.png"
     img_base64 = img_to_base64(img_path)
     if img_base64:
         st.sidebar.markdown(
@@ -290,44 +292,49 @@ def main():
     st.sidebar.markdown("---")
 
     # Sidebar for Mode Selection
-    mode = st.sidebar.radio("Select Mode:", options=["Latest Updates", "Chat with Streamly"], index=1)
+    mode = st.sidebar.radio("Select Mode:", options=["Chat with AI Bot", "Latest Updates"], index=0)
 
     st.sidebar.markdown("---")
 
     # Display basic interactions
-    show_basic_info = st.sidebar.checkbox("Show Basic Interactions", value=True)
+    show_basic_info = st.sidebar.checkbox("Show About Service", value=True)
     if show_basic_info:
         st.sidebar.markdown("""
-        ### Basic Interactions
-        - **Ask About Streamlit**: Type your questions about Streamlit's latest updates, features, or issues.
-        - **Search for Code**: Use keywords like 'code example', 'syntax', or 'how-to' to get relevant code snippets.
-        - **Navigate Updates**: Switch to 'Updates' mode to browse the latest Streamlit updates in detail.
+        - 공공 데이터 AI 검색 로봇은 data.go.kr 에서 
+        제공하는 약 1만 2천건의 방대한 공공 데이터 API를 
+        좀더 쉽고 편리하게 사용자가 검색할 수 있도록 자연어 
+        검색이 가능한 AI 기술을 적용한 서비스 입니다. 
         """)
 
     # Display advanced interactions
-    show_advanced_info = st.sidebar.checkbox("Show Advanced Interactions", value=False)
+    show_advanced_info = st.sidebar.checkbox("Show License and Refrences", value=False)
     if show_advanced_info:
         st.sidebar.markdown("""
-        ### Advanced Interactions
-        - **Generate an App**: Use keywords like **generate app**, **create app** to get a basic Streamlit app code.
-        - **Code Explanation**: Ask for **code explanation**, **walk me through the code** to understand the underlying logic of Streamlit code snippets.
-        - **Project Analysis**: Use **analyze my project**, **technical feedback** to get insights and recommendations on your current Streamlit project.
-        - **Debug Assistance**: Use **debug this**, **fix this error** to get help with troubleshooting issues in your Streamlit app.
+        - **LLM**: Naver Hyper Clovax HCX-003.
+        - **UI/UX**:  Streamlit v1.37.1 
         """)
 
     st.sidebar.markdown("---")
 
     # Load and display image with glowing effect
-    img_path = "imgs/stsidebarimg.png"
-    img_base64 = img_to_base64(img_path)
-    if img_base64:
-        st.sidebar.markdown(
-            f'<img src="data:image/png;base64,{img_base64}" class="cover-glow">',
-            unsafe_allow_html=True,
-        )
+    # img_path = "imgs/stsidebarimg.png"
+    # img_base64 = img_to_base64(img_path)
+    # if img_base64:
+    #     st.sidebar.markdown(
+    #         f'<img src="data:image/png;base64,{img_base64}" class="cover-glow">',
+    #         unsafe_allow_html=True,
+    #     )
 
-    if mode == "Chat with Streamly":
-        chat_input = st.chat_input("Ask me about Streamlit updates:")
+    st.sidebar.markdown("""
+    에스피테크놀러지(주)<br>
+    서울시 서초구 효령로 17 청진빌딩<br>
+    대표 02-2101-2500 (FAX) 02-2101-2499<br>
+    E-mail : info@sptek.co.kr
+    """, unsafe_allow_html=True)
+
+
+    if mode == "Chat with AI Bot":
+        chat_input = st.chat_input("어떤 데이터를 찾고 계신가요?")
         if chat_input:
             latest_updates = load_streamlit_updates()
             on_chat_submit(chat_input, latest_updates)
