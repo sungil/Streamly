@@ -10,24 +10,10 @@ from openai import OpenAI, OpenAIError
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
-
-# Constants
 NUMBER_OF_MESSAGES_TO_DISPLAY = 20
-API_DOCS_URL = "https://docs.streamlit.io/library/api-reference"
 
-# Retrieve and validate API key
-# OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY", None)
-# if not OPENAI_API_KEY:
-#     st.error("Please add your OpenAI API key to the Streamlit secrets.toml file.")
-#     st.stop()
-
-# Assign OpenAI API Key
-# openai.api_key = OPENAI_API_KEY
-# client = openai.OpenAI()
-
-# Streamlit Page Configuration
 st.set_page_config(
-    page_title="AI-Bot",
+    page_title="SPTEK 공공데이터 AI 검색",
     page_icon="imgs/avatar_streamly.png",
     layout="wide",
     initial_sidebar_state="auto",
@@ -50,9 +36,8 @@ st.set_page_config(
     }
 )
 
-# Streamlit Title
+# Title
 st.title("공공 데이터 AI 검색 로봇 입니다.")
-#st.title("AI-Based Korea Public Data API Recommendation Bot")
 
 def img_to_base64(image_path):
     """Convert image to base64."""
@@ -64,31 +49,7 @@ def img_to_base64(image_path):
         return None
 
 @st.cache_data(show_spinner=False)
-def long_running_task(duration):
-    """
-    Simulates a long-running operation.
-
-    Parameters:
-    - duration: int, duration of the task in seconds
-
-    Returns:
-    - str: Completion message
-    """
-    time.sleep(duration)
-    return "Long-running operation completed."
-
-@st.cache_data(show_spinner=False)
 def load_and_enhance_image(image_path, enhance=False):
-    """
-    Load and optionally enhance an image.
-
-    Parameters:
-    - image_path: str, path of the image
-    - enhance: bool, whether to enhance the image or not
-
-    Returns:
-    - img: PIL.Image.Image, (enhanced) image
-    """
     img = Image.open(image_path)
     if enhance:
         enhancer = ImageEnhance.Contrast(img)
@@ -105,57 +66,17 @@ def load_streamlit_updates():
         logging.error(f"Error loading JSON: {str(e)}")
         return {}
 
-def get_streamlit_api_code_version():
-    """
-    Get the current Streamlit API code version from the Streamlit API documentation.
-
-    Returns:
-    - str: The current Streamlit API code version.
-    """
-    try:
-        response = requests.get(API_DOCS_URL)
-        if response.status_code == 200:
-            return "1.36"
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Error connecting to the Streamlit API documentation: {str(e)}")
-    return None
-
 def display_streamlit_updates():
     """Display the latest updates of the Streamlit."""
     with st.expander("API AI Bot Announcement", expanded=False):
         st.markdown("2024.09 베타 서비스 시작")
 
 def initialize_conversation():
-    """
-    Initialize the conversation history with system and assistant messages.
-
-    Returns:
-    - list: Initialized conversation history.
-    """
-    assistant_message = "xxxx"
-
-    conversation_history = [
-        {"role": "system", "content": "You are Streamly, a specialized AI assistant trained in Streamlit."},
-        {"role": "system", "content": "Streamly, is powered by the OpenAI GPT-4o-mini model, released on July 18, 2024."},
-        {"role": "system", "content": "You are trained up to Streamlit Version 1.36.0, release on June 20, 2024."},
-        {"role": "system", "content": "Refer to conversation history to provide context to your response."},
-        {"role": "system", "content": "You were created by Madie Laine, an OpenAI Researcher."},
-        {"role": "assistant", "content": assistant_message}
-    ]
+    conversation_history = []
     return conversation_history
 
 @st.cache_data(show_spinner=False)
 def get_latest_update_from_json(keyword, latest_updates):
-    """
-    Fetch the latest Streamlit update based on a keyword.
-
-    Parameters:
-    - keyword (str): The keyword to search for in the Streamlit updates.
-    - latest_updates (dict): The latest Streamlit updates data.
-
-    Returns:
-    - str: The latest update related to the keyword, or a message if no update is found.
-    """
     for section in ["Highlights", "Notable Changes", "Other Changes"]:
         for sub_key, sub_value in latest_updates.get(section, {}).items():
             for key, value in sub_value.items():
@@ -164,15 +85,6 @@ def get_latest_update_from_json(keyword, latest_updates):
     return "No updates found for the specified keyword."
 
 def construct_formatted_message(latest_updates):
-    """
-    Construct formatted message for the latest updates.
-
-    Parameters:
-    - latest_updates (dict): The latest Streamlit updates data.
-
-    Returns:
-    - str: Formatted update messages.
-    """
     formatted_message = []
     highlights = latest_updates.get("Highlights", {})
     version_info = highlights.get("Version 1.36", {})
@@ -192,16 +104,6 @@ def construct_formatted_message(latest_updates):
 
 @st.cache_data(show_spinner=False)
 def on_chat_submit(chat_input, latest_updates):
-    """
-    Handle chat input submissions and interact with the OpenAI API.
-
-    Parameters:
-    - chat_input (str): The chat input from the user.
-    - latest_updates (dict): The latest Streamlit updates fetched from a JSON file or API.
-
-    Returns:
-    - None: Updates the chat history in Streamlit's session state.
-    """
     user_input = chat_input.strip().lower()
 
     if 'conversation_history' not in st.session_state:
@@ -210,24 +112,7 @@ def on_chat_submit(chat_input, latest_updates):
     st.session_state.conversation_history.append({"role": "user", "content": user_input})
 
     try:
-        model_engine = "gpt-4o-mini"
-        assistant_reply = "가짜 응답"
-        # 
-        # if "latest updates" in user_input:
-        #     assistant_reply = "Here are the latest highlights from Streamlit:\n"
-        #     highlights = latest_updates.get("Highlights", {})
-        #     if highlights:
-        #         for version, info in highlights.items():
-        #             description = info.get("Description", "No description available.")
-        #             assistant_reply += f"- **{version}**: {description}\n"
-        #     else:
-        #         assistant_reply = "No highlights found."
-        # else:
-        #     response = client.chat.completions.create(
-        #         model=model_engine,
-        #         messages=st.session_state.conversation_history
-        #     )
-        #     assistant_reply = response.choices[0].message.content
+        assistant_reply = send_post_request(user_input)
 
         st.session_state.conversation_history.append({"role": "assistant", "content": assistant_reply})
         st.session_state.history.append({"role": "user", "content": user_input})
@@ -243,6 +128,27 @@ def initialize_session_state():
         st.session_state.history = []
     if 'conversation_history' not in st.session_state:
         st.session_state.conversation_history = []
+
+def send_post_request(content):
+    url = "http://127.0.0.1:8000/ai/api_recommender"
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    data = {
+        'content': content
+    }
+
+    try:
+        response = requests.post(url, json=data, headers=headers)
+        if response.status_code == 200:
+            return response.json().get("reply")
+        else:
+            logging.error(f"Error: {response.status_code}, {response.text}")
+            return f"연결 상태가 좋지 않습니다({response.status_code})."
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Request failed: {e}")
+        return "연결 상태가 좋지 않습니다."
 
 def main():
     """
